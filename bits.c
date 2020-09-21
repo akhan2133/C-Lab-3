@@ -1,5 +1,4 @@
 /*
- * CS:APP Data Lab
  *
  * <Please put your name and userid here>
  *
