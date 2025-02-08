@@ -1,6 +1,6 @@
 /*
  *
- * <Please put your name and userid here>
+ * <Name: Asfand Khan, SFU ID: 301605890>
  *
  * bits.c - Source file with your solutions to the Lab.
  *          This is the file you will hand in to your instructor.
@@ -144,7 +144,10 @@ NOTES:
  *   Max ops: 8
  *   Rating: 1
  */
-int bitAnd(int x, int y) { return 0; }
+int bitAnd(int x, int y) { 
+   // Use DeMorgan's Law: x & y = ~(~x | ~y)
+   return ~(~x | ~y); 
+   }
 /*
  * bitXor - x^y using only ~ and &
  *   Example: bitXor(4, 5) = 1
@@ -152,14 +155,23 @@ int bitAnd(int x, int y) { return 0; }
  *   Max ops: 14
  *   Rating: 1
  */
-int bitXor(int x, int y) { return 0; }
+int bitXor(int x, int y) { 
+   /* Use DeMorgan’s Law: x ^ y = ~(~(x & ~y) & ~(~x & y)) */
+   return ~(~(x & ~y) & ~(~x & y)); 
+   }
 /*
  * thirdBits - return word with every third bit (starting from the LSB) set to 1
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 8
  *   Rating: 1
  */
-int thirdBits(void) { return 0; }
+int thirdBits(void) {
+   int result = 0x49;
+   result = (result << 8) + 0x24;
+   result = (result << 8) + 0x92;
+   result = (result << 8) + 0x49;
+   return result;
+   }
 /*
  * getByte - Extract byte n from word x
  *   Bytes numbered from 0 (least significant) to 3 (most significant)
@@ -168,7 +180,10 @@ int thirdBits(void) { return 0; }
  *   Max ops: 6
  *   Rating: 2
  */
-int getByte(int x, int n) { return 0; }
+int getByte(int x, int n) {
+   /* Shift the desired byte into the LSB and mask the others */
+    return (x >> (n << 3)) & 0xFF;
+   }
 /*
  * logicalShift - shift x to the right by n, using a logical shift
  *   Can assume that 0 <= n <= 31
@@ -177,9 +192,12 @@ int getByte(int x, int n) { return 0; }
  *   Max ops: 20
  *   Rating: 3
  */
-int logicalShift(int x, int n) {
+int logicalShift(int x, int n) { 
   int filter;
-  return 0;
+  // Create a filter to clear the sign extension bits
+  filter = ((1 << 31) >> n) << 1;  // Filter to clear the high bits
+  return (x >> n) & ~filter;  // Perform logical shift
+
 }
 /*
  * invert - Return x with the n bits that begin at position p inverted
@@ -193,7 +211,12 @@ int logicalShift(int x, int n) {
  *   Max ops: 20
  *   Rating: 3
  */
-int invert(int x, int p, int n) { return 0; }
+int invert(int x, int p, int n) { 
+   /* Create a mask to select the n bits starting from position p */
+   int mask = ((1 << n) + ~0) << p; 
+   return x ^ mask;  /* XOR the mask to invert the bits */  
+   }
+
 /*
  * bang - Compute !x without using !
  *   Examples: bang(3) = 0, bang(0) = 1
@@ -201,7 +224,10 @@ int invert(int x, int p, int n) { return 0; }
  *   Max ops: 12
  *   Rating: 4
  */
-int bang(int x) { return 1; }
+int bang(int x) {
+   // Shifting the sign bit of x and the two's complement of x to detect if x is zero
+   return (~((x >> 31) | (((~x) + 1) >> 31))) & 1;
+}
 
 /*
  * sign - return 1 if positive, 0 if zero, and -1 if negative
@@ -212,7 +238,10 @@ int bang(int x) { return 1; }
  *  Rating: 2
  */
 
-int sign(int x) { return 0; }
+int sign(int x) { 
+   /* Check if x is positive, zero, or negative */
+    return (x >> 31) | (!!x);
+}
 /*
  * fitsBits - return 1 if x can be represented as an
  *  n-bit, two's complement integer.
@@ -225,7 +254,9 @@ int sign(int x) { return 0; }
 
 int fitsBits(int x, int n) {
   /* docs */
-  return 0;
+  /* Shift x left to discard the n bits we're interested in and then shift back to check if the result matches */
+   int shift = 33 + ~n;
+   return !(x ^ (x << shift >> shift));
 }
 /*
  * addOK - Determine if can compute x+y without overflow
@@ -236,7 +267,13 @@ int fitsBits(int x, int n) {
  *   Rating: 3
  */
 
-int addOK(int x, int y) { return 0; }
+int addOK(int x, int y) { 
+   /* Check if the sum of x and y would overflow (same sign and opposite sign of result) */
+   int sx = x>>31;
+   int sy = y>>31;
+   int sum = (x+y) >> 31;
+   return !(~(sx ^ sy) & (sy ^ sum)); 
+   }
 /*
  * isPower2 - returns 1 if x is a power of 2, and 0 otherwise
  *   Examples: isPower2(5) = 0, isPower2(8) = 1, isPower2(0) = 0
@@ -245,7 +282,11 @@ int addOK(int x, int y) { return 0; }
  *   Max ops: 20
  *   Rating: 4
  */
-int isPower2(int x) { return 0; }
+int isPower2(int x) { 
+   /* A number is a power of 2 if it has exactly one bit set, and is positive */
+   int mask = ~0;
+   return (!(x & (x + mask)) & (!(x >> 31)) & (!(!x))); 
+   }
 /*
  * floatNegate - Return bit-level equivalent of expression -f for
  *   floating point argument f.
